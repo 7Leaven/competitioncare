@@ -1,39 +1,42 @@
 ﻿import Link from 'next/link';
 import PublicNav from '@/app/components/PublicNav';
+import Footer from '@/app/components/Footer';
 import { fetchTests } from '@/lib/api';
 
 export default async function TestsPage() {
   const tests = await fetchTests();
 
   return (
-    <main className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <PublicNav />
-      <div className="p-8 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Test Series</h1>
+      <div className="container-page py-12 flex-1">
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Test Series</h1>
+          <p className="text-slate-600 text-lg">Practice with real exam-like mock tests.</p>
+        </div>
+
         {tests.length === 0 ? (
-          <p className="text-gray-500">No tests available yet.</p>
+          <div className="card p-12 text-center">
+            <div className="text-5xl mb-4">📝</div>
+            <p className="text-slate-600">No tests available yet.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tests.map((test: any) => (
-              <Link
-                key={test.id}
-                href={`/tests/${test.id}`}
-                className="block border rounded-lg p-6 hover:shadow-lg transition"
-              >
-                <h2 className="text-xl font-semibold mb-2">{test.title}</h2>
-                <p className="text-gray-600 text-sm mb-4">
-                  {test.description || 'No description'}
-                </p>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-500">
-                    {test.duration} min - {test._count?.questions ?? 0} questions
-                  </span>
+              <Link key={test.id} href={`/tests/${test.id}`} className="card card-hover p-6 block">
+                <div className="w-12 h-12 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl mb-4">📝</div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2 line-clamp-2">{test.title}</h3>
+                <p className="text-slate-600 text-sm mb-4 line-clamp-2">{test.description || 'Full-length practice test'}</p>
+                <div className="flex items-center gap-4 text-sm text-slate-500 pt-4 border-t border-gray-100">
+                  <span>⏱ {test.duration} min</span>
+                  <span>❓ {test._count?.questions ?? 0} questions</span>
                 </div>
               </Link>
             ))}
           </div>
         )}
       </div>
-    </main>
+      <Footer />
+    </div>
   );
 }

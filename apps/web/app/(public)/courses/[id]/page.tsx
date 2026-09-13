@@ -1,59 +1,74 @@
 ﻿import Link from 'next/link';
+import PublicNav from '@/app/components/PublicNav';
+import Footer from '@/app/components/Footer';
 import { fetchCourse, fetchCourseModules } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import EnrollButton from '@/app/components/EnrollButton';
 
 export default async function CourseDetailPage({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+}: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const course = await fetchCourse(id);
   if (!course) return notFound();
-
   const modules = await fetchCourseModules(id);
 
   return (
-    <main className="min-h-screen p-8 max-w-4xl mx-auto">
-      <Link
-        href="/courses"
-        className="text-blue-600 hover:underline mb-4 inline-block"
-      >
-        Back to courses
-      </Link>
+    <div className="min-h-screen flex flex-col">
+      <PublicNav />
 
-      <h1 className="text-4xl font-bold mb-4">{course.title}</h1>
-      <p className="text-gray-600 mb-6">{course.description}</p>
-
-      <div className="border rounded-lg p-6 flex justify-between items-center mb-8">
-        <span className="text-3xl font-bold">Rs. {course.price}</span>
-        <EnrollButton courseId={course.id} alreadyEnrolled={false} />
-      </div>
-
-      <h2 className="text-2xl font-bold mb-4">Curriculum</h2>
-      {modules.length === 0 ? (
-        <p className="text-gray-500">No modules yet.</p>
-      ) : (
-        <div className="space-y-4">
-          {modules.map((mod: any, idx: number) => (
-            <div key={mod.id} className="border rounded-lg p-4">
-              <h3 className="font-semibold text-lg mb-2">
-                Module {idx + 1}: {mod.title}
-              </h3>
-              <ul className="space-y-1 ml-4">
-                {mod.lessons.map((lesson: any, li: number) => (
-                  <li key={lesson.id} className="text-gray-700">
-                    {li + 1}. {lesson.title}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+      <section className="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white">
+        <div className="container-page py-16">
+          <Link href="/courses" className="text-indigo-200 hover:text-white text-sm mb-4 inline-block">← Back to courses</Link>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">{course.title}</h1>
+          <p className="text-indigo-100 text-lg max-w-3xl">{course.description}</p>
         </div>
-      )}
-    </main>
+      </section>
+
+      <div className="container-page py-12 flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Course Curriculum</h2>
+          {modules.length === 0 ? (
+            <div className="card p-8 text-center text-slate-600">No modules yet.</div>
+          ) : (
+            <div className="space-y-4">
+              {modules.map((mod: any, idx: number) => (
+                <div key={mod.id} className="card p-6">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                      {idx + 1}
+                    </div>
+                    <h3 className="font-semibold text-lg text-slate-900">{mod.title}</h3>
+                  </div>
+                  <ul className="space-y-2 ml-11">
+                    {mod.lessons.map((lesson: any, li: number) => (
+                      <li key={lesson.id} className="flex items-center gap-2 text-slate-700 text-sm">
+                        <span className="text-indigo-500">▸</span>
+                        <span>{lesson.title}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="lg:col-span-1">
+          <div className="card p-6 sticky top-24">
+            <div className="text-4xl font-bold text-indigo-600 mb-2">₹{course.price}</div>
+            <p className="text-slate-500 text-sm mb-6">Full lifetime access</p>
+            <EnrollButton courseId={course.id} alreadyEnrolled={false} />
+            <ul className="mt-6 space-y-3 text-sm text-slate-600">
+              <li className="flex items-center gap-2">✓ Video lessons</li>
+              <li className="flex items-center gap-2">✓ Downloadable notes</li>
+              <li className="flex items-center gap-2">✓ Certificate of completion</li>
+              <li className="flex items-center gap-2">✓ Lifetime access</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </div>
   );
 }
-
-
