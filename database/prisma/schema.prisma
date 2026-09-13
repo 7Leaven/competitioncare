@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:Magicfree@127.0.0.1:5433/competitioncare?schema=public"
+}
+
+model User {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  passwordHash String
+  fullName     String
+  role         Role         @default(STUDENT)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  enrollments  Enrollment[]
+}
+
+model Course {
+  id          String       @id @default(uuid())
+  title       String
+  slug        String       @unique
+  description String
+  price       Decimal      @db.Decimal(10, 2)
+  status      CourseStatus @default(DRAFT)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  modules     Module[]
+  enrollments Enrollment[]
+}
+
+model Module {
+  id        String   @id @default(uuid())
+  title     String
+  order     Int      @default(0)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons   Lesson[]
+  createdAt DateTime @default(now())
+}
+
+model Lesson {
+  id        String   @id @default(uuid())
+  title     String
+  content   String?
+  videoUrl  String?
+  order     Int      @default(0)
+  moduleId  String
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Enrollment {
+  id         String   @id @default(uuid())
+  userId     String
+  courseId   String
+  enrolledAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  course     Course   @relation(fields: [courseId], references: [id])
+  @@unique([userId, courseId])
+}
+
+model TestSeries {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String
+  createdAt   DateTime @default(now())
+  tests       Test[]
+}
+
+model Test {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  duration    Int        @default(60)
+  totalMarks  Int        @default(0)
+  seriesId    String?
+  series      TestSeries? @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  questions   Question[]
+  attempts    Attempt[]
+  createdAt   DateTime   @default(now())
+}
+
+model Question {
+  id            String   @id @default(uuid())
+  testId        String
+  test          Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  text          String
+  options       Json
+  correctOption Int
+  explanation   String?
+  marks         Int      @default(1)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  answers       Answer[]
+}
+
+model Attempt {
+  id          String    @id @default(uuid())
+  userId      String
+  testId      String
+  test        Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+  score       Int?
+  answers     Answer[]
+}
+
+model Answer {
+  id             String   @id @default(uuid())
+  attemptId      String
+  attempt        Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption Int
+  isCorrect      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  @@unique([attemptId, questionId])
+}
+
+
+
+model CurrentAffair {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String   @unique
+  summary   String?
+  content   String
+  category  String   @default("General")
+  tags      String[]
+  publishedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+} 
+
+model Blog {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  category    String   @default("General")
+  tags        String[]
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+model Resource {
+  id            String   @id @default(uuid())
+  title         String
+  slug          String   @unique
+  description   String?
+  category      String   @default("General")
+  fileUrl       String
+  fileSize      Int?
+  fileType      String?
+  downloadCount Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+  SUPERADMIN
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
