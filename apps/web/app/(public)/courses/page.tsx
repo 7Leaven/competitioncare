@@ -3,6 +3,8 @@ import PublicNav from '@/app/components/PublicNav';
 import Footer from '@/app/components/Footer';
 import { fetchCourses } from '@/lib/api';
 
+type Course = Awaited<ReturnType<typeof fetchCourses>>[number];
+
 export default async function CoursesPage() {
   const courses = await fetchCourses();
 
@@ -22,7 +24,7 @@ export default async function CoursesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course: any) => (
+            {courses.map((course: Course) => (
               <Link key={course.id} href={`/courses/${course.id}`} className="card card-hover overflow-hidden block">
                 <div className="h-40 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                   <span className="text-white text-5xl font-bold opacity-30">{course.title[0]}</span>

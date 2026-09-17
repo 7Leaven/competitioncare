@@ -14,6 +14,9 @@ import { AdminModule } from './modules/admin/admin.module';
 import { CurrentAffairsModule } from './modules/current-affairs/current-affairs.module';
 import { BlogsModule } from './modules/blogs/blogs.module';
 import { ResourcesModule } from './modules/resources/resources.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { SearchModule } from './modules/search/search.module';
+
 
 @Module({
   imports: [
@@ -30,6 +33,8 @@ import { ResourcesModule } from './modules/resources/resources.module';
     CurrentAffairsModule,
     BlogsModule,
     ResourcesModule,
+    NotificationsModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

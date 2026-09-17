@@ -546,3 +546,145 @@ export async function deleteResource(id: string) {
   if (!res.ok) throw new Error('Delete failed');
   return res.json();
 }
+
+export async function fetchLesson(id: string) {
+  const res = await fetch(`${API_URL}/api/lessons/${id}`, { cache: 'no-store' });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function markLessonComplete(lessonId: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/lessons/${lessonId}/complete`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to mark complete');
+  return res.json();
+}
+
+export async function fetchCourseProgress(courseId: string) {
+  const token = getToken();
+  if (!token) return { completedLessonIds: [], totalLessons: 0, completedCount: 0, percent: 0 };
+  const res = await fetch(`${API_URL}/api/courses/${courseId}/progress`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return { completedLessonIds: [], totalLessons: 0, completedCount: 0, percent: 0 };
+  return res.json();
+}
+
+export async function fetchProfile() {
+  const token = getToken();
+  if (!token) return null;
+  const res = await fetch(`${API_URL}/api/auth/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function updateProfile(data: {
+  fullName?: string;
+  bio?: string;
+  avatarUrl?: string;
+}) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/auth/profile`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Update failed');
+  }
+  return res.json();
+}
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string,
+) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/auth/change-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Password change failed');
+  }
+  return res.json();
+}
+
+export async function fetchNotifications() {
+  const token = getToken();
+  if (!token) return { items: [], unreadCount: 0 };
+  const res = await fetch(`${API_URL}/api/notifications`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return { items: [], unreadCount: 0 };
+  return res.json();
+}
+
+export async function fetchUnreadCount() {
+  const token = getToken();
+  if (!token) return { unreadCount: 0 };
+  const res = await fetch(`${API_URL}/api/notifications/unread-count`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return { unreadCount: 0 };
+  return res.json();
+}
+
+export async function markNotificationRead(id: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/notifications/${id}/read`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed');
+  return res.json();
+}
+
+export async function markAllNotificationsRead() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/notifications/read-all`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed');
+  return res.json();
+}
+
+export async function deleteNotification(id: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/notifications/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed');
+  return res.json();
+}
+
+export async function search(q: string) {
+  if (!q || q.trim().length < 2) {
+    return { courses: [], tests: [], currentAffairs: [], blogs: [], resources: [], total: 0 };
+  }
+  const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(q)}`, {
+    cache: 'no-store',
+  });
+  if (!res.ok) return { courses: [], tests: [], currentAffairs: [], blogs: [], resources: [], total: 0 };
+  return res.json();
+}

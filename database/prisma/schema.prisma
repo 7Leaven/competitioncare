@@ -12,6 +12,8 @@ model User {
   email        String       @unique
   passwordHash String
   fullName     String
+  bio          String?
+  avatarUrl    String?
   role         Role         @default(STUDENT)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
@@ -121,20 +123,18 @@ model Answer {
   @@unique([attemptId, questionId])
 }
 
-
-
 model CurrentAffair {
-  id        String   @id @default(uuid())
-  title     String
-  slug      String   @unique
-  summary   String?
-  content   String
-  category  String   @default("General")
-  tags      String[]
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  summary     String?
+  content     String
+  category    String   @default("General")
+  tags        String[]
   publishedAt DateTime @default(now())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-} 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
 model Blog {
   id          String   @id @default(uuid())
@@ -149,7 +149,6 @@ model Blog {
   updatedAt   DateTime @updatedAt
 }
 
-
 model Resource {
   id            String   @id @default(uuid())
   title         String
@@ -162,6 +161,26 @@ model Resource {
   downloadCount Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model LessonProgress {
+  id          String    @id @default(uuid())
+  userId      String
+  lessonId    String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  @@unique([userId, lessonId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 enum Role {

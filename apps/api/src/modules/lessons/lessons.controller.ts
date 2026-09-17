@@ -1,5 +1,12 @@
 ﻿import {
-  Body, Controller, Delete, Get, Param, Post, UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { LessonsService } from './lessons.service';
@@ -30,6 +37,18 @@ export class LessonsController {
   @Get('lessons/:id')
   findOne(@Param('id') id: string) {
     return this.lessonsService.findOne(id);
+  }
+
+  @Post('lessons/:id/complete')
+  @UseGuards(JwtAuthGuard)
+  markComplete(@Req() req: any, @Param('id') id: string) {
+    return this.lessonsService.markComplete(req.user.id, id);
+  }
+
+  @Get('courses/:courseId/progress')
+  @UseGuards(JwtAuthGuard)
+  getProgress(@Req() req: any, @Param('courseId') courseId: string) {
+    return this.lessonsService.getCourseProgress(req.user.id, courseId);
   }
 
   @Delete('lessons/:id')

@@ -5,6 +5,17 @@ import { fetchCourse, fetchCourseModules } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import EnrollButton from '@/app/components/EnrollButton';
 
+type CourseLesson = {
+  id: string | number;
+  title: string;
+};
+
+type CourseModule = {
+  id: string | number;
+  title: string;
+  lessons: CourseLesson[];
+};
+
 export default async function CourseDetailPage({
   params,
 }: { params: Promise<{ id: string }> }) {
@@ -19,7 +30,9 @@ export default async function CourseDetailPage({
 
       <section className="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white">
         <div className="container-page py-16">
-          <Link href="/courses" className="text-indigo-200 hover:text-white text-sm mb-4 inline-block">← Back to courses</Link>
+          <Link href="/courses" className="text-indigo-200 hover:text-white text-sm mb-4 inline-block">
+            ← Back to courses
+          </Link>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{course.title}</h1>
           <p className="text-indigo-100 text-lg max-w-3xl">{course.description}</p>
         </div>
@@ -32,7 +45,7 @@ export default async function CourseDetailPage({
             <div className="card p-8 text-center text-slate-600">No modules yet.</div>
           ) : (
             <div className="space-y-4">
-              {modules.map((mod: any, idx: number) => (
+              {modules.map((mod: CourseModule, idx: number) => (
                 <div key={mod.id} className="card p-6">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
@@ -41,10 +54,15 @@ export default async function CourseDetailPage({
                     <h3 className="font-semibold text-lg text-slate-900">{mod.title}</h3>
                   </div>
                   <ul className="space-y-2 ml-11">
-                    {mod.lessons.map((lesson: any, li: number) => (
-                      <li key={lesson.id} className="flex items-center gap-2 text-slate-700 text-sm">
-                        <span className="text-indigo-500">▸</span>
-                        <span>{lesson.title}</span>
+                    {mod.lessons.map((lesson: CourseLesson) => (
+                      <li key={lesson.id}>
+                        <Link
+                          href={`/courses/${id}/lessons/${lesson.id}`}
+                          className="flex items-center gap-2 text-slate-700 text-sm hover:text-indigo-600 transition group"
+                        >
+                          <span className="text-indigo-500 group-hover:translate-x-0.5 transition">▸</span>
+                          <span>{lesson.title}</span>
+                        </Link>
                       </li>
                     ))}
                   </ul>
