@@ -1,9 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
-
+import { MailService } from '../mail/mail.service';
 @Injectable()
 export class AttemptsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mail: MailService,
+  ) {}
 
   async start(userId: string, testId: string) {
     const test = await this.prisma.test.findUnique({
@@ -67,7 +70,7 @@ export class AttemptsService {
 
     await this.prisma.answer.createMany({ data: createdAnswers });
 
-    const updated = await this.prisma.attempt.update({
+            const updated = await this.prisma.attempt.update({
       where: { id: attemptId },
       data: { submittedAt: new Date(), score },
       include: {
@@ -77,6 +80,16 @@ export class AttemptsService {
         test: true,
       },
     });
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, fullName: true },
+    });
+    if (user) {
+      this.mail
+        .sendTestResult(user.email, user.fullName, updated.test.title, score)
+        .catch(() => {});
+    }
 
     return updated;
   }

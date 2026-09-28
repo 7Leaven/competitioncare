@@ -1,4 +1,4 @@
-﻿const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -686,5 +686,317 @@ export async function search(q: string) {
     cache: 'no-store',
   });
   if (!res.ok) return { courses: [], tests: [], currentAffairs: [], blogs: [], resources: [], total: 0 };
+  return res.json();
+}
+
+export async function updateLesson(id: string, data: {
+  title?: string;
+  content?: string;
+  videoUrl?: string;
+  notesUrl?: string;
+  notesLabel?: string;
+  order?: number;
+}) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/lessons/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Update failed');
+  }
+  return res.json();
+}
+
+export async function createModule(courseId: string, title: string, order = 0) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/courses/${courseId}/modules`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ title, order }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Create failed');
+  }
+  return res.json();
+}
+
+export async function createLesson(
+  moduleId: string,
+  data: {
+    title: string;
+    content?: string;
+    videoUrl?: string;
+    notesUrl?: string;
+    notesLabel?: string;
+    order?: number;
+  },
+) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/modules/${moduleId}/lessons`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Create failed');
+  }
+  return res.json();
+}
+
+export async function fetchBookmarks() {
+  const token = getToken();
+  if (!token) return { items: [], total: 0 };
+  const res = await fetch(`${API_URL}/api/bookmarks`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return { items: [], total: 0 };
+  return res.json();
+}
+
+export async function checkBookmark(itemType: string, itemId: string) {
+  const token = getToken();
+  if (!token) return { bookmarked: false };
+  const res = await fetch(
+    `${API_URL}/api/bookmarks/check?itemType=${itemType}&itemId=${itemId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    },
+  );
+  if (!res.ok) return { bookmarked: false };
+  return res.json();
+}
+
+export async function addBookmark(itemType: string, itemId: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/bookmarks`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ itemType, itemId }),
+  });
+  if (!res.ok) throw new Error('Failed to bookmark');
+  return res.json();
+}
+
+export async function removeBookmark(itemType: string, itemId: string) {
+  const token = getToken();
+  const res = await fetch(
+    `${API_URL}/api/bookmarks?itemType=${itemType}&itemId=${itemId}`,
+    {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  if (!res.ok) throw new Error('Failed to remove bookmark');
+  return res.json();
+}
+
+export async function fetchMyAnalytics() {
+  const token = getToken();
+  if (!token) return null;
+  const res = await fetch(`${API_URL}/api/analytics/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function fetchMyCertificates() {
+  const token = getToken();
+  if (!token) return [];
+  const res = await fetch(`${API_URL}/api/certificates`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function fetchCertificate(id: string) {
+  const token = getToken();
+  if (!token) return null;
+  const res = await fetch(`${API_URL}/api/certificates/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function verifyCertificate(certNumber: string) {
+  const res = await fetch(`${API_URL}/api/certificates/verify/${certNumber}`, {
+    cache: 'no-store',
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function issueCourseCertificate(courseId: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/certificates/course/${courseId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Failed to issue certificate');
+  }
+  return res.json();
+}
+
+export async function issueTestCertificate(testId: string, attemptId: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/certificates/test/${testId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ attemptId }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Failed to issue certificate');
+  }
+  return res.json();
+}
+
+export async function fetchProgressDashboard() {
+  const token = getToken();
+  if (!token) return null;
+  const res = await fetch(`\/api/progress-dashboard/me`, {
+    headers: { Authorization: `Bearer \eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NDZkNWQyZi03ZGYwLTQ2NjAtYmY1Mi1jNzE2NDFmMmZmNGYiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3ODk2NjAzOTQsImV4cCI6MTc5MDI2NTE5NH0.UuhlC8O5GnuQGVfQRH75xsYE0aBIU4LFNdZVq_Z9mKs` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function createDoubt(subject: string, question: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/doubts`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ subject, question }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Failed to submit doubt');
+  }
+  return res.json();
+}
+
+export async function fetchMyDoubts() {
+  const token = getToken();
+  if (!token) return [];
+  const res = await fetch(`${API_URL}/api/doubts/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function fetchAllDoubts() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/doubts`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function answerDoubt(id: string, answer: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/doubts/${id}/answer`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ answer }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Failed to submit answer');
+  }
+  return res.json();
+}
+
+export async function deleteDoubt(id: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/doubts/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Delete failed');
+  return res.json();
+}
+
+export async function subscribeNewsletter(email: string, name?: string) {
+  const res = await fetch(`${API_URL}/api/newsletter/subscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, name, source: 'website' }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Subscription failed');
+  }
+  return res.json();
+}
+
+export async function fetchNewsletterSubscribers() {
+  const token = getToken();
+  if (!token) return [];
+  const res = await fetch(`${API_URL}/api/newsletter`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function fetchNewsletterCount() {
+  const token = getToken();
+  if (!token) return { total: 0, active: 0 };
+  const res = await fetch(`${API_URL}/api/newsletter/count`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return { total: 0, active: 0 };
+  return res.json();
+}
+
+export async function deleteNewsletterSubscriber(id: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/newsletter/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Delete failed');
   return res.json();
 }

@@ -3,9 +3,9 @@ import { EnrollmentsService } from './enrollments.service';
 import { EnrollmentsController } from './enrollments.controller';
 import { PrismaService } from '../../database/prisma.service';
 import { AuthModule } from '../auth/auth.module';
-
+import { MailModule } from '../mail/mail.module';
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule , MailModule],
   controllers: [EnrollmentsController],
   providers: [EnrollmentsService, PrismaService],
 })

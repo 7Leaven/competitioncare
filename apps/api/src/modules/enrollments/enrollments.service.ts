@@ -1,20 +1,34 @@
 ﻿import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
-
+import { MailService } from '../mail/mail.service';
 @Injectable()
 export class EnrollmentsService {
-  constructor(private prisma: PrismaService) {}
-
+   constructor(
+    private prisma: PrismaService,
+    private mail: MailService,
+  ) {}
   async enroll(userId: string, courseId: string) {
     const existing = await this.prisma.enrollment.findUnique({
       where: { userId_courseId: { userId, courseId } },
     });
     if (existing) throw new ConflictException('Already enrolled');
 
-    return this.prisma.enrollment.create({
+    const enrollment = await this.prisma.enrollment.create({
       data: { userId, courseId },
       include: { course: true },
     });
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, fullName: true },
+    });
+    if (user) {
+      this.mail
+        .sendEnrollmentConfirmed(user.email, user.fullName, enrollment.course.title)
+        .catch(() => {});
+    }
+
+    return enrollment;
   }
 
   async myCourses(userId: string) {

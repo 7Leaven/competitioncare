@@ -1,9 +1,10 @@
-﻿import {
+import {
   Body,
   Controller,
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -23,7 +24,14 @@ export class LessonsController {
   @Roles(Role.ADMIN, Role.SUPERADMIN)
   create(
     @Param('moduleId') moduleId: string,
-    @Body() body: { title: string; content?: string; videoUrl?: string; order?: number },
+    @Body() body: {
+      title: string;
+      content?: string;
+      videoUrl?: string;
+      notesUrl?: string;
+      notesLabel?: string;
+      order?: number;
+    },
   ) {
     return this.lessonsService.create(
       moduleId,
@@ -31,12 +39,21 @@ export class LessonsController {
       body.content,
       body.videoUrl,
       body.order ?? 0,
+      body.notesUrl,
+      body.notesLabel,
     );
   }
 
   @Get('lessons/:id')
   findOne(@Param('id') id: string) {
     return this.lessonsService.findOne(id);
+  }
+
+  @Patch('lessons/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.SUPERADMIN)
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.lessonsService.update(id, body);
   }
 
   @Post('lessons/:id/complete')

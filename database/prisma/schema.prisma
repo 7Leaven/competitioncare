@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id           String       @id @default(uuid())
-  email        String       @unique
-  passwordHash String
-  fullName     String
-  bio          String?
-  avatarUrl    String?
-  role         Role         @default(STUDENT)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  enrollments  Enrollment[]
+  id                  String       @id @default(uuid())
+  email               String       @unique
+  passwordHash        String
+  fullName            String
+  bio                 String?
+  avatarUrl           String?
+  lastStreakNotified  Int          @default(0)
+  role                Role         @default(STUDENT)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  enrollments         Enrollment[]
 }
 
 model Course {
@@ -44,14 +45,16 @@ model Module {
 }
 
 model Lesson {
-  id        String   @id @default(uuid())
-  title     String
-  content   String?
-  videoUrl  String?
-  order     Int      @default(0)
-  moduleId  String
-  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id         String   @id @default(uuid())
+  title      String
+  content    String?
+  videoUrl   String?
+  notesUrl   String?
+  notesLabel String?
+  order      Int      @default(0)
+  moduleId   String
+  module     Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
 }
 
 model Enrollment {
@@ -74,16 +77,17 @@ model TestSeries {
 }
 
 model Test {
-  id          String     @id @default(uuid())
+  id          String      @id @default(uuid())
   title       String
   description String?
-  duration    Int        @default(60)
-  totalMarks  Int        @default(0)
+  duration    Int         @default(60)
+  scheduledAt DateTime?
+  totalMarks  Int         @default(0)
   seriesId    String?
   series      TestSeries? @relation(fields: [seriesId], references: [id], onDelete: SetNull)
   questions   Question[]
   attempts    Attempt[]
-  createdAt   DateTime   @default(now())
+  createdAt   DateTime    @default(now())
 }
 
 model Question {
@@ -180,6 +184,47 @@ model Notification {
   message   String
   link      String?
   read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  itemType  String
+  itemId    String
+  createdAt DateTime @default(now())
+  @@unique([userId, itemType, itemId])
+}
+
+model Certificate {
+  id         String   @id @default(uuid())
+  userId     String
+  courseId   String?
+  testId     String?
+  title      String
+  issuedAt   DateTime @default(now())
+  certNumber String   @unique
+}
+
+model Doubt {
+  id         String    @id @default(uuid())
+  userId     String
+  subject    String
+  question   String
+  answer     String?
+  answeredBy String?
+  answeredAt DateTime?
+  status     String    @default("OPEN")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  source    String   @default("website")
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }
 

@@ -1,20 +1,11 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import PublicNav from '@/app/components/PublicNav';
 import Footer from '@/app/components/Footer';
 import { fetchCourse, fetchCourseModules } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import EnrollButton from '@/app/components/EnrollButton';
-
-type CourseLesson = {
-  id: string | number;
-  title: string;
-};
-
-type CourseModule = {
-  id: string | number;
-  title: string;
-  lessons: CourseLesson[];
-};
+import BookmarkButton from '@/app/components/BookmarkButton';
+import CertificateButton from '@/app/components/CertificateButton';
 
 export default async function CourseDetailPage({
   params,
@@ -45,7 +36,7 @@ export default async function CourseDetailPage({
             <div className="card p-8 text-center text-slate-600">No modules yet.</div>
           ) : (
             <div className="space-y-4">
-              {modules.map((mod: CourseModule, idx: number) => (
+              {modules.map((mod: any, idx: number) => (
                 <div key={mod.id} className="card p-6">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
@@ -54,7 +45,7 @@ export default async function CourseDetailPage({
                     <h3 className="font-semibold text-lg text-slate-900">{mod.title}</h3>
                   </div>
                   <ul className="space-y-2 ml-11">
-                    {mod.lessons.map((lesson: CourseLesson) => (
+                    {mod.lessons.map((lesson: any) => (
                       <li key={lesson.id}>
                         <Link
                           href={`/courses/${id}/lessons/${lesson.id}`}
@@ -77,6 +68,12 @@ export default async function CourseDetailPage({
             <div className="text-4xl font-bold text-indigo-600 mb-2">₹{course.price}</div>
             <p className="text-slate-500 text-sm mb-6">Full lifetime access</p>
             <EnrollButton courseId={course.id} alreadyEnrolled={false} />
+            <div className="mt-4">
+              <BookmarkButton itemType="COURSE" itemId={course.id} />
+            </div>
+            <div className="mt-3">
+              <CertificateButton courseId={course.id} />
+            </div>
             <ul className="mt-6 space-y-3 text-sm text-slate-600">
               <li className="flex items-center gap-2">✓ Video lessons</li>
               <li className="flex items-center gap-2">✓ Downloadable notes</li>

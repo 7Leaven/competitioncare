@@ -16,7 +16,12 @@ import { BlogsModule } from './modules/blogs/blogs.module';
 import { ResourcesModule } from './modules/resources/resources.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { SearchModule } from './modules/search/search.module';
-
+import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { CertificatesModule } from './modules/certificates/certificates.module';
+import { ProgressDashboardModule } from './modules/progress-dashboard/progress-dashboard.module';
+import { DoubtsModule } from './modules/doubts/doubts.module';
+import { NewsletterModule } from './modules/newsletter/newsletter.module';
 
 @Module({
   imports: [
@@ -35,6 +40,14 @@ import { SearchModule } from './modules/search/search.module';
     ResourcesModule,
     NotificationsModule,
     SearchModule,
+    BookmarksModule,
+    AnalyticsModule,
+    CertificatesModule,
+    ProgressDashboardModule,
+    DoubtsModule,
+    NewsletterModule,
+    
+  
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -50,13 +50,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (loading) return <main className="p-8">Checking access...</main>;
   if (!user) return null;
 
-  const links = [
+    const links = [
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/courses', label: 'Courses' },
+    { href: '/admin/lessons', label: 'Lessons' },
     { href: '/admin/tests', label: 'Tests' },
     { href: '/admin/current-affairs', label: 'Current Affairs' },
     { href: '/admin/blogs', label: 'Blogs' },
     { href: '/admin/resources', label: 'Resources' },
+    { href: '/admin/doubts', label: 'Doubts' },
+    { href: '/admin/newsletter', label: 'Newsletter' },
   ];
 
   return (

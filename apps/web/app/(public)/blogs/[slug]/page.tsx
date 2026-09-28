@@ -1,8 +1,9 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import PublicNav from '@/app/components/PublicNav';
 import Footer from '@/app/components/Footer';
 import { fetchBlog } from '@/lib/api';
 import { notFound } from 'next/navigation';
+import BookmarkButton from '@/app/components/BookmarkButton';
 
 export default async function BlogDetailPage({
   params,
@@ -15,17 +16,30 @@ export default async function BlogDetailPage({
     <div className="min-h-screen flex flex-col">
       <PublicNav />
       <article className="container-page py-12 flex-1 max-w-3xl">
-        <Link href="/blogs" className="text-indigo-600 hover:underline mb-6 inline-block text-sm">← Back to Blog</Link>
+        <Link href="/blogs" className="text-indigo-600 hover:underline mb-6 inline-block text-sm">
+          ← Back to Blog
+        </Link>
 
         <div className="flex items-center gap-3 mb-4">
           <span className="badge badge-success">{item.category}</span>
-          <span className="text-sm text-slate-500">{new Date(item.publishedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+          <span className="text-sm text-slate-500">
+            {new Date(item.publishedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
         </div>
 
         <h1 className="text-4xl font-bold text-slate-900 mb-4 leading-tight">{item.title}</h1>
-        {item.excerpt && <p className="text-lg text-slate-600 mb-8 italic border-l-4 border-emerald-500 pl-4">{item.excerpt}</p>}
 
-        <div className="prose prose-slate max-w-none whitespace-pre-wrap text-slate-800 leading-relaxed">{item.content}</div>
+        <div className="mb-6">
+          <BookmarkButton itemType="BLOG" itemId={item.id} />
+        </div>
+
+        {item.excerpt && (
+          <p className="text-lg text-slate-600 mb-8 italic border-l-4 border-emerald-500 pl-4">{item.excerpt}</p>
+        )}
+
+        <div className="prose prose-slate max-w-none whitespace-pre-wrap text-slate-800 leading-relaxed">
+          {item.content}
+        </div>
 
         {item.tags && item.tags.length > 0 && (
           <div className="mt-10 pt-6 border-t border-gray-200">
