@@ -23,6 +23,10 @@ import { ProgressDashboardModule } from './modules/progress-dashboard/progress-d
 import { DoubtsModule } from './modules/doubts/doubts.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { StudentsModule } from './modules/students/students.module';
+
+import { MailModule } from './modules/mail/mail.module';
+
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -47,7 +51,7 @@ import { StudentsModule } from './modules/students/students.module';
     DoubtsModule,
     NewsletterModule,
     StudentsModule,
-  
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

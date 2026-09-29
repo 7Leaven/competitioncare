@@ -59,14 +59,22 @@ export default function ManageTestPage() {
         </p>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Questions</h2>
-        <Link
-          href={`/admin/tests/${id}/questions/new`}
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 text-sm"
-        >
-          + Add Question
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href={`/admin/tests/${id}/questions/bulk`}
+            className="btn-secondary text-sm"
+          >
+            Bulk Import
+          </Link>
+          <Link
+            href={`/admin/tests/${id}/questions/new`}
+            className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 text-sm"
+          >
+            + Add Question
+          </Link>
+        </div>
       </div>
 
       {(!test.questions || test.questions.length === 0) ? (

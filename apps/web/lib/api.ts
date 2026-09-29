@@ -1000,3 +1000,116 @@ export async function deleteNewsletterSubscriber(id: string) {
   if (!res.ok) throw new Error('Delete failed');
   return res.json();
 }
+
+
+export async function fetchStudents(params?: {
+  search?: string;
+  role?: string;
+  skip?: number;
+  take?: number;
+}) {
+  const token = getToken();
+  const q = new URLSearchParams();
+  if (params?.search) q.set('search', params.search);
+  if (params?.role) q.set('role', params.role);
+  if (params?.skip) q.set('skip', String(params.skip));
+  if (params?.take) q.set('take', String(params.take));
+  const res = await fetch(`${API_URL}/api/admin/students?${q}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return { items: [], total: 0 };
+  return res.json();
+}
+
+export async function fetchStudentStats() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/admin/students/stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return { total: 0, students: 0, admins: 0, last30Days: 0, last7Days: 0 };
+  return res.json();
+}
+
+export async function fetchStudent(id: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/admin/students/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function updateStudentRole(id: string, role: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/admin/students/${id}/role`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ role }),
+  });
+  if (!res.ok) throw new Error('Failed to update role');
+  return res.json();
+}
+
+
+export async function bulkImportQuestions(
+  testId: string,
+  questions: {
+    text: string;
+    options: string[];
+    correctOption: number;
+    explanation?: string;
+    marks?: number;
+  }[],
+) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/tests/${testId}/questions/bulk`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ questions }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Bulk import failed');
+  }
+  return res.json();
+}
+
+
+export async function fetchAnalyticsSummary() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/admin/analytics/summary`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error('Failed to fetch summary');
+  return res.json();
+}
+
+export async function fetchSignups(days = 30) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/admin/analytics/signups?days=${days}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error('Failed to fetch signups');
+  return res.json();
+}
+
+export async function fetchTopCourses(limit = 5) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/admin/analytics/top-courses?limit=${limit}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error('Failed to fetch top courses');
+  return res.json();
+}

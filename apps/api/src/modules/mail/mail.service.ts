@@ -269,6 +269,25 @@ export class MailService {
     `;
     return this.send(email, `${streak}-day streak! Keep going 🔥`, html);
   }
+
+  async sendBroadcastEmail(to: string, subject: string, html: string) {
+    const result = await this.send(to, subject, html);
+
+    // Normalize response for BroadcastService
+    if (result && typeof result === 'object') {
+      if ('skipped' in result) {
+        return { success: false, error: 'Email skipped — no API key' };
+      }
+      if ('error' in result) {
+        return { success: false, error: String(result.error) };
+      }
+      return { success: true, id: (result as any)?.id };
+    }
+
+    return { success: true };
+  }
+
+
 }
 
 

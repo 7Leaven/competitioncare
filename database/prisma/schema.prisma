@@ -227,7 +227,24 @@ model NewsletterSubscriber {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }
+model Payment {
+  id            String        @id @default(uuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("INR")
+  status        PaymentStatus @default(PENDING)
+  gateway       String?
+  transactionId String?
+  createdAt     DateTime      @default(now())
+}
 
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
 enum Role {
   STUDENT
   INSTRUCTOR
