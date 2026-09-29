@@ -22,7 +22,7 @@ import { CertificatesModule } from './modules/certificates/certificates.module';
 import { ProgressDashboardModule } from './modules/progress-dashboard/progress-dashboard.module';
 import { DoubtsModule } from './modules/doubts/doubts.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
-
+import { StudentsModule } from './modules/students/students.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -46,7 +46,7 @@ import { NewsletterModule } from './modules/newsletter/newsletter.module';
     ProgressDashboardModule,
     DoubtsModule,
     NewsletterModule,
-    
+    StudentsModule,
   
   ],
   controllers: [AppController],

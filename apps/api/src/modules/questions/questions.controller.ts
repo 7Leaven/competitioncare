@@ -1,5 +1,11 @@
 import {
-  Body, Controller, Delete, Get, Param, Post, UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { QuestionsService } from './questions.service';
@@ -16,7 +22,8 @@ export class QuestionsController {
   @Roles(Role.ADMIN, Role.SUPERADMIN)
   create(
     @Param('testId') testId: string,
-    @Body() body: {
+    @Body()
+    body: {
       text: string;
       options: any;
       correctOption: number;
@@ -26,6 +33,26 @@ export class QuestionsController {
     },
   ) {
     return this.questionsService.create({ testId, ...body });
+  }
+
+  @Post('tests/:testId/questions/bulk')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.SUPERADMIN)
+  bulkCreate(
+    @Param('testId') testId: string,
+    @Body()
+    body: {
+      questions: {
+        text: string;
+        options: string[];
+        correctOption: number;
+        explanation?: string;
+        marks?: number;
+        order?: number;
+      }[];
+    },
+  ) {
+    return this.questionsService.bulkCreate(testId, body.questions || []);
   }
 
   @Get('tests/:testId/questions')
