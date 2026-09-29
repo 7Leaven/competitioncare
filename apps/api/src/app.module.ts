@@ -23,7 +23,7 @@ import { ProgressDashboardModule } from './modules/progress-dashboard/progress-d
 import { DoubtsModule } from './modules/doubts/doubts.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { StudentsModule } from './modules/students/students.module';
-
+import { BroadcastModule } from './modules/broadcast/broadcast.module';
 import { MailModule } from './modules/mail/mail.module';
 
 
@@ -52,6 +52,7 @@ import { MailModule } from './modules/mail/mail.module';
     NewsletterModule,
     StudentsModule,
     MailModule,
+    BroadcastModule,
   ],
   controllers: [AppController],
   providers: [AppService],
