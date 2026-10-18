@@ -20,6 +20,7 @@ model User {
   updatedAt           DateTime     @updatedAt
     payments    Payment[]
   enrollments         Enrollment[]
+    activityLogs  ActivityLog[]
 }
 
 model Course {
@@ -240,6 +241,24 @@ model Payment {
   gateway       String?
   transactionId String?
   createdAt     DateTime      @default(now())
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?   @relation(fields: [userId], references: [id])
+  action     String
+  entity     String?
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([entity, entityId])
 }
 
 enum PaymentStatus {

@@ -25,7 +25,7 @@ import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { StudentsModule } from './modules/students/students.module';
 import { BroadcastModule } from './modules/broadcast/broadcast.module';
 import { MailModule } from './modules/mail/mail.module';
-
+import { ActivityLogsModule } from './modules/activity-logs/activity-logs.module';
 
 @Module({
   imports: [
@@ -53,6 +53,7 @@ import { MailModule } from './modules/mail/mail.module';
     StudentsModule,
     MailModule,
     BroadcastModule,
+    ActivityLogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

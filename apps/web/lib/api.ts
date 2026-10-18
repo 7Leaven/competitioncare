@@ -1113,3 +1113,34 @@ export async function fetchTopCourses(limit = 5) {
   if (!res.ok) throw new Error('Failed to fetch top courses');
   return res.json();
 }
+
+
+export async function fetchActivityLogs(params?: {
+  userId?: string;
+  action?: string;
+  skip?: number;
+  take?: number;
+}) {
+  const token = getToken();
+  const q = new URLSearchParams();
+  if (params?.userId) q.set('userId', params.userId);
+  if (params?.action) q.set('action', params.action);
+  if (params?.skip) q.set('skip', String(params.skip));
+  if (params?.take) q.set('take', String(params.take));
+  const res = await fetch(`${API_URL}/api/admin/activity-logs?${q}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return { items: [], total: 0 };
+  return res.json();
+}
+
+export async function fetchActivityActions() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/admin/activity-logs/actions`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
